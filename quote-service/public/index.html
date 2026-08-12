@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assurance — get a quote for your team</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+    <header class="site">
+        <div class="wrap">
+            <span class="brand">Assurance</span>
+            <span class="tagline">Health cover for your team, priced to break even.</span>
+        </div>
+    </header>
+
+    <main>
+        <h1>Get a quote in two minutes</h1>
+        <p class="lede">
+            Tell us about your team. We price the premium to cover expected claims and nothing more —
+            we make our money on a flat subscription per member, not on your premium.
+        </p>
+
+        <div class="steps">
+            <div id="bar1" class="done"></div>
+            <div id="bar2"></div>
+            <div id="bar3"></div>
+        </div>
+
+        <form id="quote-form" class="card" novalidate>
+            <!-- Step 1 -->
+            <fieldset id="step1">
+                <legend>1. Your company</legend>
+                <label for="companyName">Company name</label>
+                <input id="companyName" name="companyName" required autocomplete="organization">
+
+                <div class="row">
+                    <div>
+                        <label for="industry">Industry</label>
+                        <select id="industry" name="industry"></select>
+                    </div>
+                    <div>
+                        <label for="headcount">Number of employees</label>
+                        <input id="headcount" name="headcount" type="number" min="1" max="100000" value="12" required>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div>
+                        <label for="yearFounded">Year founded <span class="hint">(optional)</span></label>
+                        <input id="yearFounded" name="yearFounded" type="number" min="1800" max="2026">
+                    </div>
+                    <div>
+                        <label for="currentInsurer">Current insurer <span class="hint">(optional)</span></label>
+                        <input id="currentInsurer" name="currentInsurer">
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button type="button" class="primary" data-next="2">Continue</button>
+                </div>
+            </fieldset>
+
+            <!-- Step 2 -->
+            <fieldset id="step2" class="hidden">
+                <legend>2. Your team</legend>
+                <p class="lede" style="margin-bottom:1rem">
+                    Roughly how many people are in each group? We only ever ask for counts — never anyone's health data.
+                </p>
+
+                <h2 style="font-size:.95rem">Age</h2>
+                <div class="mix"><span>Under 30</span><input type="range" id="under30" min="0" max="100" value="40"><output for="under30">40</output></div>
+                <div class="mix"><span>30 to 50</span><input type="range" id="from30to50" min="0" max="100" value="50"><output for="from30to50">50</output></div>
+                <div class="mix"><span>Over 50</span><input type="range" id="over50" min="0" max="100" value="10"><output for="over50">10</output></div>
+
+                <h2 style="font-size:.95rem; margin-top:1.5rem">Household</h2>
+                <div class="mix"><span>Individual</span><input type="range" id="individual" min="0" max="100" value="55"><output for="individual">55</output></div>
+                <div class="mix"><span>Couple</span><input type="range" id="couple" min="0" max="100" value="25"><output for="couple">25</output></div>
+                <div class="mix"><span>Family</span><input type="range" id="family" min="0" max="100" value="20"><output for="family">20</output></div>
+
+                <div class="actions">
+                    <button type="button" class="ghost" data-back="1">Back</button>
+                    <button type="button" class="primary" data-next="3">Continue</button>
+                </div>
+            </fieldset>
+
+            <!-- Step 3 -->
+            <fieldset id="step3" class="hidden">
+                <legend>3. Coverage &amp; contact</legend>
+
+                <div class="coverage" id="coverage-options"></div>
+
+                <div class="row" style="margin-top:1.5rem">
+                    <div>
+                        <label for="contactName">Your name</label>
+                        <input id="contactName" name="contactName" required autocomplete="name">
+                    </div>
+                    <div>
+                        <label for="contactEmail">Email</label>
+                        <input id="contactEmail" name="contactEmail" type="email" required autocomplete="email">
+                    </div>
+                </div>
+                <div class="row">
+                    <div>
+                        <label for="contactPhone">Phone <span class="hint">(optional)</span></label>
+                        <input id="contactPhone" name="contactPhone" type="tel" autocomplete="tel">
+                    </div>
+                    <div>
+                        <label for="effectiveDate">Desired start date <span class="hint">(optional)</span></label>
+                        <input id="effectiveDate" name="effectiveDate" type="date">
+                    </div>
+                </div>
+
+                <div class="actions">
+                    <button type="button" class="ghost" data-back="2">Back</button>
+                    <button type="submit" class="primary" id="submit-btn">Request my quote</button>
+                </div>
+                <p id="form-error" class="error hidden"></p>
+            </fieldset>
+        </form>
+
+        <!-- Confirmation -->
+        <section id="confirmation" class="card hidden">
+            <h2>Request received</h2>
+            <p>Your reference is <span class="ref" id="reference"></span></p>
+            <p class="lede">
+                An advisor will call you within 24 hours to go through your quote.
+                Keep this reference — you can check the status below at any time.
+            </p>
+            <div class="actions">
+                <button type="button" class="ghost" id="check-status">Check status</button>
+                <button type="button" class="ghost" id="start-over">New request</button>
+            </div>
+            <p id="status-line" class="lede hidden" style="margin-top:1rem"></p>
+        </section>
+    </main>
+
+    <footer class="site">
+        Assurance — a demo application. No real insurance is sold here and no personal health data is collected.
+    </footer>
+
+    <script src="/config.js"></script>
+    <script src="/faro.js"></script>
+    <script src="/app.js"></script>
+</body>
+
+</html>

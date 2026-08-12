@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>pricing-service</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 46rem; margin: 3rem auto; padding: 0 1rem; color: #1c1c1c; }
+        code, pre { background: #f4f4f5; border-radius: 4px; padding: .15rem .35rem; font-size: .9em; }
+        pre { padding: .8rem; overflow-x: auto; }
+        h1 { font-size: 1.4rem; }
+        li { margin: .35rem 0; }
+    </style>
+</head>
+<body>
+    <h1>pricing-service</h1>
+    <p>The business model: the premium is priced to break even, the subscription is the revenue.</p>
+    <ul>
+        <li><code>POST /price</code> — price an organisation</li>
+        <li><code>POST /price/simulate</code> — same, with employee overrides</li>
+        <li><a href="/peer-groups"><code>GET /peer-groups</code></a></li>
+        <li><a href="/coverage-levels"><code>GET /coverage-levels</code></a></li>
+        <li><a href="/subscription-grid"><code>GET /subscription-grid</code></a></li>
+        <li><a href="/health"><code>GET /health</code></a></li>
+    </ul>
+    <p>Try it:</p>
+    <pre>curl -s localhost:3002/price -H 'content-type: application/json' -d '{
+  "industry": "tech", "headcount": 12, "coverageLevel": "comfort",
+  "ageMix": { "under30": 5, "from30to50": 6, "over50": 1 },
+  "compositionMix": { "individual": 7, "couple": 3, "family": 2 }
+}' | jq</pre>
+</body>
+</html>

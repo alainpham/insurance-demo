@@ -1,0 +1,72 @@
+// Grafana Alloy: one pipeline for the backend services (OTLP) and one for the
+// browser (Faro). Both land in the same LGTM stack, which is what makes a click
+// in the public form and its backend trace a single trace in Tempo.
+
+logging {
+  level  = "info"
+  format = "logfmt"
+}
+
+/* --------------------------------------------------------- backend (OTLP) */
+
+otelcol.receiver.otlp "services" {
+  grpc { endpoint = "0.0.0.0:4317" }
+  http { endpoint = "0.0.0.0:4318" }
+
+  output {
+    metrics = [otelcol.processor.batch.default.input]
+    logs    = [otelcol.processor.batch.default.input]
+    traces  = [otelcol.processor.batch.default.input]
+  }
+}
+
+otelcol.processor.batch "default" {
+  timeout = "2s"
+
+  output {
+    metrics = [otelcol.exporter.otlp.lgtm.input]
+    logs    = [otelcol.exporter.otlp.lgtm.input]
+    traces  = [otelcol.exporter.otlp.lgtm.input]
+  }
+}
+
+otelcol.exporter.otlp "lgtm" {
+  client {
+    endpoint = "lgtm:4317"
+    tls { insecure = true }
+  }
+}
+
+/* --------------------------------------------------------- browser (Faro) */
+
+faro.receiver "browser" {
+  server {
+    listen_address       = "0.0.0.0"
+    listen_port          = 12347
+    cors_allowed_origins = ["*"]
+  }
+
+  output {
+    logs   = [loki.process.faro.receiver]
+    traces = [otelcol.processor.batch.default.input]
+  }
+}
+
+// Give browser telemetry a service name so it sits next to the backend
+// services in Grafana rather than in an unlabelled bucket.
+loki.process "faro" {
+  stage.static_labels {
+    values = {
+      service_name = "quote-web",
+      source       = "faro",
+    }
+  }
+
+  forward_to = [loki.write.lgtm.receiver]
+}
+
+loki.write "lgtm" {
+  endpoint {
+    url = "http://lgtm:3100/loki/api/v1/push"
+  }
+}

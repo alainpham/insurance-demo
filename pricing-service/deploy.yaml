@@ -1,0 +1,119 @@
+---
+# pricing-service — The business model: credibility-weighted premium plus per-member subscription.
+#
+# Images come from Docker Hub (alainpham/<service>); telemetry goes to the
+# Alloy receiver already running in the cluster. Only the browser-facing URLs in
+# the `assurance-endpoints` ConfigMap change between environments.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app.kubernetes.io/name: "pricing-service"
+    app.kubernetes.io/component: "api"
+    app.kubernetes.io/part-of: "assurance"
+    app.kubernetes.io/instance: "demo"
+    app.kubernetes.io/version: "demo"
+  name: "pricing-service"
+  namespace: assurance
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: "pricing-service"
+      app.kubernetes.io/instance: "demo"
+  template:
+    metadata:
+      annotations:
+        prometheus.io/scrape: "false"
+      labels:
+        app.kubernetes.io/name: "pricing-service"
+        app.kubernetes.io/component: "api"
+        app.kubernetes.io/part-of: "assurance"
+        app.kubernetes.io/instance: "demo"
+        app.kubernetes.io/version: "demo"
+    spec:
+      containers:
+      - name: pricing-service
+        image: "alainpham/pricing-service:demo"
+        imagePullPolicy: Always
+        env:
+          - name: POD_NAME
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.name
+          - name: POD_NAMESPACE
+            valueFrom:
+              fieldRef:
+                fieldPath: metadata.namespace
+          - name: DATABASE_URL
+            valueFrom:
+              secretKeyRef:
+                name: postgres
+                key: DATABASE_URL
+          - name: OTEL_METRICS_EXPORTER
+            value: "otlp"
+          - name: OTEL_LOGS_EXPORTER
+            value: "otlp"
+          - name: OTEL_TRACES_EXPORTER
+            value: "otlp"
+          - name: OTEL_EXPORTER_OTLP_PROTOCOL
+            value: "http/protobuf"
+          - name: OTEL_EXPORTER_OTLP_ENDPOINT
+            value: "http://grafana-k8s-monitoring-alloy-receiver.default.svc.cluster.local:4318"
+          - name: OTEL_METRIC_EXPORT_INTERVAL
+            value: "15000"
+          - name: OTEL_NODE_DISABLED_INSTRUMENTATIONS
+            value: "fs"
+          - name: OTEL_SERVICE_NAME
+            value: "pricing-service"
+          - name: NODE_OPTIONS
+            value: "--require @opentelemetry/auto-instrumentations-node/register"
+          - name: OTEL_RESOURCE_ATTRIBUTES
+            value: "service.name=pricing-service,service.namespace=assurance,service.instance.id=$(POD_NAME),deployment.environment=demo,k8s.namespace.name=$(POD_NAMESPACE),k8s.pod.name=$(POD_NAME)"
+        livenessProbe:
+          httpGet:
+            path: "/health"
+            port: 8080
+          initialDelaySeconds: 10
+          periodSeconds: 10
+          failureThreshold: 6
+        readinessProbe:
+          httpGet:
+            path: "/health"
+            port: 8080
+          initialDelaySeconds: 2
+          periodSeconds: 3
+          failureThreshold: 60
+        resources:
+          requests:
+            cpu: "50m"
+            memory: "128Mi"
+          limits:
+            cpu: "1"
+            memory: "512Mi"
+        ports:
+          - containerPort: 8080
+            name: http
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app.kubernetes.io/name: "pricing-service"
+    app.kubernetes.io/component: "api"
+    app.kubernetes.io/part-of: "assurance"
+    app.kubernetes.io/instance: "demo"
+    app.kubernetes.io/version: "demo"
+  name: "pricing-service"
+  namespace: assurance
+spec:
+  type: ClusterIP
+  ports:
+  - name: "http"
+    port: 8080
+    protocol: "TCP"
+    targetPort: 8080
+  selector:
+    app.kubernetes.io/name: "pricing-service"
+    app.kubernetes.io/instance: "demo"

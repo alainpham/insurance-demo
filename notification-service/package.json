@@ -1,0 +1,24 @@
+{
+  "name": "notification-service",
+  "version": "1.0.0",
+  "main": "server/server.js",
+  "scripts": {
+    "start": "node server/server.js",
+    "dev": "LIVERELOAD=1 node --watch --watch-path=./server --watch-path=./public server/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "Renders the quote PDF and sends email.",
+  "dependencies": {
+    "@opentelemetry/api": "1.9.1",
+    "@opentelemetry/auto-instrumentations-node": "0.79.0",
+    "axios": "1.19.0",
+    "body-parser": "2.3.0",
+    "cors": "2.8.6",
+    "express": "5.2.1",
+    "nodemailer": "6.10.1",
+    "pdfkit": "0.15.2",
+    "pg": "8.16.3"
+  }
+}

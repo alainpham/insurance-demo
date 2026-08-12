@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>notification-service</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 46rem; margin: 3rem auto; padding: 0 1rem; color: #1c1c1c; }
+        code { background: #f4f4f5; border-radius: 4px; padding: .15rem .35rem; font-size: .9em; }
+        h1 { font-size: 1.4rem; }
+        li { margin: .35rem 0; }
+    </style>
+</head>
+
+<body>
+    <h1>notification-service</h1>
+    <p>Renders the quote PDF and sends email.</p>
+    <ul>
+        <li><code>POST /documents/quote</code> — render a quote PDF (idempotent per quote version)</li>
+        <li><a href="/documents"><code>GET /documents</code></a> — everything rendered so far</li>
+        <li><code>POST /emails</code> — send a templated email</li>
+        <li><a href="/emails"><code>GET /emails</code></a> — the outbox</li>
+        <li><a href="/health"><code>GET /health</code></a></li>
+    </ul>
+    <p>Mail goes to <a href="http://localhost:8025">Mailpit on :8025</a>, where you can watch it arrive.</p>
+</body>
+
+</html>

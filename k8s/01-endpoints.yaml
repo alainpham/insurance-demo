@@ -1,0 +1,25 @@
+# The three URLs the services hand to a *browser* rather than calling themselves:
+# the magic link in the quote email, the PDF download link, and the Faro
+# collector the public page posts RUM to. None of them can use in-cluster DNS,
+# so they are configured here rather than derived.
+#
+# The defaults assume `make k8s-forward`, which port-forwards the services onto
+# the same localhost ports docker-compose uses. If you expose the apps through
+# your own ingress, set these to those hostnames instead — that is the only edit
+# needed.
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: assurance-endpoints
+  namespace: assurance
+data:
+  # Where the prospect opens their quote (magic link in the email).
+  PUBLIC_BASE_URL: "http://localhost:3001"
+
+  # Where the prospect downloads the quote PDF.
+  DOCUMENT_BASE_URL: "http://localhost:3004/documents"
+
+  # Grafana Faro collector, called from the prospect's browser. Point this at
+  # whatever Faro receiver your Alloy exposes externally; leave it as-is and the
+  # page simply runs without RUM (faro.js degrades quietly if it can't connect).
+  FARO_URL: "http://localhost:12347/collect"

@@ -1,0 +1,176 @@
+{
+  "insurancePremiumTax": 0.1327,
+  "fullCredibilityMemberYears": 3000,
+  "claimsHandlingRatio": 0.06,
+  "industries": {
+    "tech": {
+      "label": "Software & tech",
+      "annualClaimsEur": 470
+    },
+    "professional_services": {
+      "label": "Professional services",
+      "annualClaimsEur": 500
+    },
+    "retail": {
+      "label": "Retail & e-commerce",
+      "annualClaimsEur": 530
+    },
+    "manufacturing": {
+      "label": "Manufacturing",
+      "annualClaimsEur": 575
+    },
+    "healthcare": {
+      "label": "Healthcare & social",
+      "annualClaimsEur": 600
+    },
+    "construction": {
+      "label": "Construction",
+      "annualClaimsEur": 620
+    },
+    "hospitality": {
+      "label": "Hospitality & food service",
+      "annualClaimsEur": 655
+    },
+    "other": {
+      "label": "Other",
+      "annualClaimsEur": 530
+    }
+  },
+  "ageFactors": {
+    "under30": 0.78,
+    "from30to50": 1.0,
+    "over50": 1.42
+  },
+  "compositionFactors": {
+    "individual": {
+      "label": "Individual",
+      "factor": 1.0
+    },
+    "couple": {
+      "label": "Couple",
+      "factor": 1.55
+    },
+    "family": {
+      "label": "Family",
+      "factor": 2.1
+    }
+  },
+  "coverageLevels": [
+    {
+      "code": "essential",
+      "label": "Essential",
+      "factor": 0.8,
+      "benefits": [
+        {
+          "label": "Routine care",
+          "value": "100% of the statutory reference tariff"
+        },
+        {
+          "label": "Hospital",
+          "value": "100%, private room 40 €/night"
+        },
+        {
+          "label": "Optical",
+          "value": "100 € every 2 years"
+        },
+        {
+          "label": "Dental",
+          "value": "100%, no annual cap on prosthetics"
+        },
+        {
+          "label": "Hearing",
+          "value": "Zero-out-of-pocket basket only"
+        },
+        {
+          "label": "Alternative medicine",
+          "value": "Not covered"
+        }
+      ]
+    },
+    {
+      "code": "comfort",
+      "label": "Comfort",
+      "factor": 1.0,
+      "benefits": [
+        {
+          "label": "Routine care",
+          "value": "150% of the statutory reference tariff"
+        },
+        {
+          "label": "Hospital",
+          "value": "150%, private room 70 €/night"
+        },
+        {
+          "label": "Optical",
+          "value": "250 € every 2 years"
+        },
+        {
+          "label": "Dental",
+          "value": "200%, 1 200 € annual cap"
+        },
+        {
+          "label": "Hearing",
+          "value": "500 € per ear"
+        },
+        {
+          "label": "Alternative medicine",
+          "value": "150 €/year"
+        }
+      ]
+    },
+    {
+      "code": "premium",
+      "label": "Premium",
+      "factor": 1.35,
+      "benefits": [
+        {
+          "label": "Routine care",
+          "value": "250% of the statutory reference tariff"
+        },
+        {
+          "label": "Hospital",
+          "value": "250%, private room 110 €/night"
+        },
+        {
+          "label": "Optical",
+          "value": "450 € every 2 years"
+        },
+        {
+          "label": "Dental",
+          "value": "350%, 2 500 € annual cap"
+        },
+        {
+          "label": "Hearing",
+          "value": "900 € per ear"
+        },
+        {
+          "label": "Alternative medicine",
+          "value": "400 €/year"
+        }
+      ]
+    }
+  ],
+  "subscriptionGrid": {
+    "micro": {
+      "label": "1–9 members",
+      "eurPerMember": 8.5
+    },
+    "small": {
+      "label": "10–49 members",
+      "eurPerMember": 7.5
+    },
+    "medium": {
+      "label": "50–249 members",
+      "eurPerMember": 6.5
+    },
+    "large": {
+      "label": "250+ members",
+      "eurPerMember": 5.5
+    }
+  },
+  "appetite": {
+    "excludedIndustries": [],
+    "_comment": "Checked against blended expected claims BEFORE the coverage factor: an organisation is not out of appetite merely because it asked for Premium cover. Only a high-claims industry with an older workforce reaches this.",
+    "maxAnnualClaimsPerMember": 800
+  }
+}

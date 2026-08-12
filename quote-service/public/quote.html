@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assurance — your quote</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+    <header class="site">
+        <div class="wrap">
+            <span class="brand">Assurance</span>
+            <span class="tagline">Your quote</span>
+        </div>
+    </header>
+
+    <main>
+        <div id="loading" class="card">Loading your quote…</div>
+
+        <div id="error" class="card hidden">
+            <h2>We couldn't open this quote</h2>
+            <p class="lede" id="error-message"></p>
+        </div>
+
+        <div id="quote" class="hidden">
+            <h1 id="company"></h1>
+            <p class="lede">
+                Quote <span id="reference"></span> · <span id="headcount"></span> members ·
+                valid until <span id="valid-until"></span>
+                <span class="badge" id="state"></span>
+            </p>
+
+            <div class="card">
+                <h2>Your monthly price</h2>
+                <div class="price-lines">
+                    <div class="price-line premium">
+                        <span class="label">Insurance premium
+                            <span class="sub">Covers your team's expected claims. We price this to break even — there is no margin in it.</span>
+                        </span>
+                        <span class="amount" id="premium"></span>
+                    </div>
+                    <div class="price-line subscription">
+                        <span class="label">Assurance subscription
+                            <span class="sub">Our fee, per member per month. This is how we make our money.</span>
+                        </span>
+                        <span class="amount" id="subscription"></span>
+                    </div>
+                    <div class="price-line total">
+                        <span class="label">Total per member, per month
+                            <span class="sub" id="monthly-total"></span>
+                        </span>
+                        <span class="amount" id="total"></span>
+                    </div>
+                </div>
+
+                <div class="pooling">
+                    <strong>How your premium was set</strong>
+                    <div class="bar">
+                        <div class="own" id="bar-own"></div>
+                        <div class="pooled" id="bar-pooled"></div>
+                    </div>
+                    <div class="legend">
+                        <span><i style="background:var(--accent)"></i><span id="pct-own"></span> your own claims</span>
+                        <span><i style="background:var(--accent-soft)"></i><span id="pct-pooled"></span> pooled with similar organisations</span>
+                    </div>
+                    <ul class="rationale" id="rationale"></ul>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2>Rates by household</h2>
+                <table>
+                    <thead>
+                        <tr><th>Household</th><th class="num">Share of your team</th><th class="num">Premium / month</th></tr>
+                    </thead>
+                    <tbody id="rate-table"></tbody>
+                </table>
+            </div>
+
+            <div class="card">
+                <h2 id="coverage-title">What's covered</h2>
+                <table>
+                    <tbody id="benefits"></tbody>
+                </table>
+            </div>
+
+            <div class="card" id="decision">
+                <h2>Ready to go ahead?</h2>
+                <p class="lede">Accepting is not binding — an advisor will confirm everything with you before cover starts.</p>
+                <div class="actions">
+                    <button class="primary" id="accept">Accept this quote</button>
+                    <button class="ghost" id="decline">Not for us</button>
+                    <a id="pdf" class="hidden" href="#" target="_blank"><button type="button" class="ghost">Download PDF</button></a>
+                </div>
+                <p id="decision-error" class="error hidden"></p>
+            </div>
+
+            <div class="card hidden" id="closed">
+                <h2 id="closed-title"></h2>
+                <p class="lede" id="closed-message"></p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="site">
+        Assurance — a demo application. No real insurance is sold here.
+    </footer>
+
+    <script src="/config.js"></script>
+    <script src="/faro.js"></script>
+    <script src="/quote.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assurance — back office</title>
+    <link rel="stylesheet" href="/style.css">
+</head>
+
+<body>
+    <!-- ------------------------------------------------------------ login -->
+    <div id="login" class="login-wrap hidden">
+        <div class="card">
+            <div class="brand" style="font-size:1.25rem">Assurance <small>back office</small></div>
+            <label for="email">Email</label>
+            <input id="email" type="email" autocomplete="username" value="alice@assurance.demo">
+            <label for="password">Password</label>
+            <input id="password" type="password" autocomplete="current-password" value="demo">
+            <div class="actions">
+                <button class="primary" id="login-btn" style="width:100%">Sign in</button>
+            </div>
+            <p id="login-error" class="notice error hidden"></p>
+            <div class="demo-users">
+                Demo accounts (password <code>demo</code>):
+                <div id="demo-users"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- -------------------------------------------------------------- app -->
+    <div id="app" class="hidden">
+        <header class="app">
+            <div class="wrap">
+                <span class="brand">Assurance <small>back office</small></span>
+                <nav>
+                    <button data-view="tasks" class="active">My tasks</button>
+                    <button data-view="portfolio">Portfolio</button>
+                </nav>
+                <span class="who">
+                    <span id="who-name"></span>
+                    <span class="role" id="who-role"></span>
+                    <button class="ghost" id="logout">Sign out</button>
+                </span>
+            </div>
+        </header>
+
+        <main>
+            <!-- ------------------------------------------------------ tasks -->
+            <section id="view-tasks">
+                <h1>My tasks</h1>
+                <p class="lede" id="tasks-lede"></p>
+
+                <div class="card">
+                    <div style="display:flex;gap:.75rem;align-items:end;flex-wrap:wrap">
+                        <div style="flex:0 0 12rem">
+                            <label for="role-filter" style="margin-top:0">Queue</label>
+                            <select id="role-filter">
+                                <option value="">My role</option>
+                                <option value="advisor">Advisor</option>
+                                <option value="actuary">Actuary</option>
+                                <option value="supervisor">Supervisor</option>
+                                <option value="all">All roles</option>
+                            </select>
+                        </div>
+                        <button class="ghost" id="refresh-tasks">Refresh</button>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Task</th><th>Company</th><th class="num">Members</th>
+                                <th class="num">Pooling</th><th class="num">Monthly</th>
+                                <th>Quote</th><th class="num">Waiting</th>
+                            </tr>
+                        </thead>
+                        <tbody id="task-rows"></tbody>
+                    </table>
+                    <p id="tasks-empty" class="spinner hidden">Nothing waiting. Submit a request on the public site to create one.</p>
+                </div>
+            </section>
+
+            <!-- ------------------------------------------------------- case -->
+            <section id="view-case" class="hidden">
+                <button class="ghost" id="back-to-tasks" style="margin-bottom:1rem">&larr; Back to tasks</button>
+                <div id="case-body"></div>
+            </section>
+
+            <!-- -------------------------------------------------- portfolio -->
+            <section id="view-portfolio" class="hidden">
+                <h1>Portfolio</h1>
+                <p class="lede">Every quote in the system. The business dashboard lives in Grafana — this is the working list.</p>
+                <div class="stat-row" id="portfolio-stats"></div>
+                <div class="card">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Reference</th><th>Company</th><th>Industry</th>
+                                <th class="num">Members</th><th class="num">Pooling</th>
+                                <th class="num">Monthly</th><th>State</th>
+                            </tr>
+                        </thead>
+                        <tbody id="portfolio-rows"></tbody>
+                    </table>
+                </div>
+            </section>
+        </main>
+    </div>
+
+    <script src="/app.js"></script>
+</body>
+
+</html>

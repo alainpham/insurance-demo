@@ -1,0 +1,151 @@
+name: assurance
+
+x-otel: &otel
+  NODE_OPTIONS: "--require @opentelemetry/auto-instrumentations-node/register"
+  OTEL_TRACES_EXPORTER: "otlp"
+  OTEL_METRICS_EXPORTER: "otlp"
+  OTEL_LOGS_EXPORTER: "otlp"
+  OTEL_EXPORTER_OTLP_PROTOCOL: "http/protobuf"
+  OTEL_EXPORTER_OTLP_ENDPOINT: "http://alloy:4318"
+  OTEL_METRIC_EXPORT_INTERVAL: "15000"
+  OTEL_NODE_DISABLED_INSTRUMENTATIONS: "fs"
+
+x-db: &db
+  DATABASE_URL: "postgres://assurance:assurance@postgres:5432/assurance"
+
+services:
+
+  # ------------------------------------------------------------- platform --
+
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: assurance
+      POSTGRES_PASSWORD: assurance
+      POSTGRES_DB: assurance
+    ports: ["5432:5432"]
+    volumes: ["pgdata:/var/lib/postgresql/data"]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U assurance -d assurance"]
+      interval: 3s
+      timeout: 3s
+      retries: 20
+
+  mailpit:
+    image: axllent/mailpit:latest
+    ports:
+      - "8025:8025"   # web UI — the audience watches the email arrive here
+      - "1025:1025"   # SMTP
+    environment:
+      MP_MAX_MESSAGES: "500"
+      MP_SMTP_AUTH_ACCEPT_ANY: "1"
+      MP_SMTP_AUTH_ALLOW_INSECURE: "1"
+
+  # -------------------------------------------------------- observability --
+
+  lgtm:
+    image: grafana/otel-lgtm:latest
+    ports:
+      - "3000:3000"   # Grafana
+    environment:
+      GF_AUTH_ANONYMOUS_ENABLED: "true"
+      GF_AUTH_ANONYMOUS_ORG_ROLE: "Admin"
+      GF_AUTH_DISABLE_LOGIN_FORM: "true"
+    volumes:
+      - "lgtmdata:/data"
+      - "./observability/grafana/dashboards:/otel-lgtm/grafana/conf/provisioning/dashboards:ro"
+
+  alloy:
+    image: grafana/alloy:latest
+    command:
+      - run
+      - --server.http.listen-addr=0.0.0.0:12345
+      - --storage.path=/var/lib/alloy/data
+      - /etc/alloy/config.alloy
+    ports:
+      - "12345:12345"   # Alloy UI
+      - "12347:12347"   # Faro receiver (the browser posts here)
+    volumes:
+      - "./observability/alloy/config.alloy:/etc/alloy/config.alloy:ro"
+    depends_on: [lgtm]
+
+  # --------------------------------------------------------------- services --
+
+  pricing-service:
+    build: ./pricing-service
+    ports: ["3002:8080"]
+    environment:
+      <<: [*otel, *db]
+      OTEL_SERVICE_NAME: "pricing-service"
+      OTEL_RESOURCE_ATTRIBUTES: "service.name=pricing-service,service.namespace=assurance,deployment.environment=demo"
+      CHAOS_LATENCY_MS: "0"
+      CHAOS_ERROR_RATE: "0"
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  quote-service:
+    build: ./quote-service
+    ports: ["3001:8080"]
+    environment:
+      <<: [*otel, *db]
+      OTEL_SERVICE_NAME: "quote-service"
+      OTEL_RESOURCE_ATTRIBUTES: "service.name=quote-service,service.namespace=assurance,deployment.environment=demo"
+      WORKFLOW_URL: "http://workflow-service:8080"
+      PRICING_URL: "http://pricing-service:8080"
+      FARO_URL: "http://localhost:12347/collect"
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  workflow-service:
+    build: ./workflow-service
+    ports: ["3003:8080"]
+    environment:
+      <<: [*otel, *db]
+      OTEL_SERVICE_NAME: "workflow-service"
+      OTEL_RESOURCE_ATTRIBUTES: "service.name=workflow-service,service.namespace=assurance,deployment.environment=demo"
+      QUOTE_URL: "http://quote-service:8080"
+      PRICING_URL: "http://pricing-service:8080"
+      NOTIFICATION_URL: "http://notification-service:8080"
+      PUBLIC_BASE_URL: "http://localhost:3001"
+      TICK_MS: "30000"
+      REFERRAL_HEADCOUNT: "250"
+      REFERRAL_Z: "0.5"
+      CONTACT_RETRY_MINUTES: "2880"
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  notification-service:
+    build: ./notification-service
+    ports: ["3004:8080"]
+    environment:
+      <<: [*otel, *db]
+      OTEL_SERVICE_NAME: "notification-service"
+      OTEL_RESOURCE_ATTRIBUTES: "service.name=notification-service,service.namespace=assurance,deployment.environment=demo"
+      SMTP_HOST: "mailpit"
+      SMTP_PORT: "1025"
+      MAIL_FROM: "Assurance <advisor@assurance.demo>"
+      DOCUMENT_DIR: "/data/documents"
+      DOCUMENT_BASE_URL: "http://localhost:3004/documents"
+    volumes: ["documents:/data/documents"]
+    depends_on:
+      postgres: { condition: service_healthy }
+
+  backoffice-service:
+    build: ./backoffice-service
+    ports: ["3005:8080"]
+    environment:
+      <<: [*otel, *db]
+      OTEL_SERVICE_NAME: "backoffice-service"
+      OTEL_RESOURCE_ATTRIBUTES: "service.name=backoffice-service,service.namespace=assurance,deployment.environment=demo"
+      QUOTE_URL: "http://quote-service:8080"
+      WORKFLOW_URL: "http://workflow-service:8080"
+      PRICING_URL: "http://pricing-service:8080"
+      JWT_SECRET: "assurance-demo-secret-not-for-production"
+      DEMO_PASSWORD: "demo"
+    depends_on:
+      postgres: { condition: service_healthy }
+
+volumes:
+  pgdata:
+  lgtmdata:
+  documents:
