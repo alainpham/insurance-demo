@@ -21,7 +21,7 @@
       "title": "Members covered",
       "description": "Members under accepted quotes.",
       "gridPos": { "h": 4, "w": 4, "x": 0, "y": 1 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": { "type": "prometheus", "uid": "grafanacloud-prom" },
       "targets": [{ "refId": "A", "expr": "sum(assurance_portfolio_members_covered)" }],
       "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "text" } }, "overrides": [] },
       "options": { "graphMode": "none", "textMode": "value", "colorMode": "value", "reduceOptions": { "calcs": ["lastNotNull"] } }
@@ -31,7 +31,7 @@
       "title": "Subscription revenue / month",
       "description": "This is the revenue. The per-member subscription is where Assurance makes its money.",
       "gridPos": { "h": 4, "w": 5, "x": 4, "y": 1 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": { "type": "prometheus", "uid": "grafanacloud-prom" },
       "targets": [{ "refId": "A", "expr": "sum(assurance_portfolio_subscription_revenue_month_eur)" }],
       "fieldConfig": { "defaults": { "unit": "currencyEUR", "decimals": 0, "color": { "mode": "fixed", "fixedColor": "green" } }, "overrides": [] },
       "options": { "graphMode": "area", "textMode": "value", "colorMode": "value", "reduceOptions": { "calcs": ["lastNotNull"] } }
@@ -41,7 +41,7 @@
       "title": "Premium volume / month",
       "description": "Priced to break even against expected claims. Target margin: zero.",
       "gridPos": { "h": 4, "w": 5, "x": 9, "y": 1 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": { "type": "prometheus", "uid": "grafanacloud-prom" },
       "targets": [{ "refId": "A", "expr": "sum(assurance_portfolio_premium_volume_month_eur)" }],
       "fieldConfig": { "defaults": { "unit": "currencyEUR", "decimals": 0, "color": { "mode": "fixed", "fixedColor": "blue" } }, "overrides": [] },
       "options": { "graphMode": "area", "textMode": "value", "colorMode": "value", "reduceOptions": { "calcs": ["lastNotNull"] } }
@@ -50,7 +50,7 @@
       "type": "stat",
       "title": "Quotes accepted",
       "gridPos": { "h": 4, "w": 4, "x": 14, "y": 1 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": { "type": "prometheus", "uid": "grafanacloud-prom" },
       "targets": [{ "refId": "A", "expr": "sum(assurance_quotes_by_state{state=\"ACCEPTED\"}) or vector(0)" }],
       "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "green" } }, "overrides": [] },
       "options": { "graphMode": "none", "textMode": "value", "colorMode": "value", "reduceOptions": { "calcs": ["lastNotNull"] } }
@@ -60,7 +60,7 @@
       "title": "Premium discounts refused",
       "description": "Attempts to discount the premium, refused with 422. The business model, enforced in code.",
       "gridPos": { "h": 4, "w": 6, "x": 18, "y": 1 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": { "type": "prometheus", "uid": "grafanacloud-prom" },
       "targets": [{ "refId": "A", "expr": "sum(assurance_pricing_premium_discount_refused_total) or vector(0)" }],
       "fieldConfig": { "defaults": { "unit": "short", "color": { "mode": "fixed", "fixedColor": "orange" } }, "overrides": [] },
       "options": { "graphMode": "area", "textMode": "value", "colorMode": "value", "reduceOptions": { "calcs": ["lastNotNull"] } }
@@ -70,7 +70,7 @@
       "title": "Where the money comes from",
       "description": "The premium pays claims; the subscription pays Assurance. Keeping them apart is the whole model.",
       "gridPos": { "h": 9, "w": 12, "x": 0, "y": 5 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": { "type": "prometheus", "uid": "grafanacloud-prom" },
       "targets": [
         { "refId": "A", "expr": "sum(assurance_portfolio_premium_volume_month_eur)", "legendFormat": "Premium (pays claims, no margin)" },
         { "refId": "B", "expr": "sum(assurance_portfolio_subscription_revenue_month_eur)", "legendFormat": "Subscription (the revenue)" }
@@ -92,7 +92,7 @@
       "title": "Average pooling weight Z, by company size",
       "description": "Z = how much of the price comes from the organisation's own claims. Small and new means heavily pooled, which is the protection being sold.",
       "gridPos": { "h": 9, "w": 12, "x": 12, "y": 5 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": { "type": "prometheus", "uid": "grafanacloud-prom" },
       "targets": [
         {
           "refId": "A",
@@ -120,7 +120,7 @@
       "type": "bargauge",
       "title": "Average premium per member / month, by industry",
       "gridPos": { "h": 9, "w": 8, "x": 0, "y": 15 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": { "type": "prometheus", "uid": "grafanacloud-prom" },
       "targets": [
         {
           "refId": "A",
@@ -136,7 +136,7 @@
       "title": "Expected claims per member / year, by industry",
       "description": "The peer-group forecast the premium is built from.",
       "gridPos": { "h": 9, "w": 8, "x": 8, "y": 15 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": { "type": "prometheus", "uid": "grafanacloud-prom" },
       "targets": [
         {
           "refId": "A",
@@ -151,7 +151,7 @@
       "type": "piechart",
       "title": "Pricings by underwriting appetite",
       "gridPos": { "h": 9, "w": 8, "x": 16, "y": 15 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": { "type": "prometheus", "uid": "grafanacloud-prom" },
       "targets": [
         { "refId": "A", "expr": "sum by (out_of_appetite) (assurance_pricing_total)", "legendFormat": "out of appetite: {{out_of_appetite}}" }
       ],

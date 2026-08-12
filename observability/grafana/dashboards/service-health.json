@@ -13,7 +13,7 @@
       "type": "timeseries",
       "title": "Request rate by service",
       "gridPos": { "h": 8, "w": 8, "x": 0, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": { "type": "prometheus", "uid": "grafanacloud-prom" },
       "targets": [
         {
           "refId": "A",
@@ -32,7 +32,7 @@
       "title": "Error rate by service",
       "description": "Share of responses with a 5xx status.",
       "gridPos": { "h": 8, "w": 8, "x": 8, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": { "type": "prometheus", "uid": "grafanacloud-prom" },
       "targets": [
         {
           "refId": "A",
@@ -54,7 +54,7 @@
       "type": "timeseries",
       "title": "Latency p95 by service",
       "gridPos": { "h": 8, "w": 8, "x": 16, "y": 0 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": { "type": "prometheus", "uid": "grafanacloud-prom" },
       "targets": [
         {
           "refId": "A",
@@ -73,7 +73,7 @@
       "title": "pricing-service latency — the one that gets slow under chaos",
       "description": "`make chaos-on` pushes this to ~1.4s p99 and 10% errors. Watch the funnel dashboard react.",
       "gridPos": { "h": 8, "w": 12, "x": 0, "y": 8 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": { "type": "prometheus", "uid": "grafanacloud-prom" },
       "targets": [
         {
           "refId": "A",
@@ -102,7 +102,7 @@
       "title": "Outbound calls between services",
       "description": "Who calls whom, and how fast. The dependency map is in Tempo's service graph.",
       "gridPos": { "h": 8, "w": 12, "x": 12, "y": 8 },
-      "datasource": { "type": "prometheus", "uid": "prometheus" },
+      "datasource": { "type": "prometheus", "uid": "grafanacloud-prom" },
       "targets": [
         {
           "refId": "A",
@@ -120,7 +120,7 @@
       "type": "logs",
       "title": "Logs — every line carries its trace id, so you can jump straight to the trace",
       "gridPos": { "h": 11, "w": 24, "x": 0, "y": 16 },
-      "datasource": { "type": "loki", "uid": "loki" },
+      "datasource": { "type": "loki", "uid": "grafanacloud-logs" },
       "targets": [
         { "refId": "A", "expr": "{service_name=~\"quote-service|pricing-service|workflow-service|notification-service|backoffice-service|quote-web\"}" }
       ],

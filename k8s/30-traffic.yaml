@@ -1,0 +1,69 @@
+# A steady trickle of quote requests, generated from inside the cluster.
+#
+# Deployed by `make k8s-traffic`, removed by `make k8s-traffic-stop`. Not part of
+# `make k8s-deploy` — it is opt-in, because it writes real data.
+#
+# Running it in-cluster rather than from a laptop means the demo keeps producing
+# traffic when the laptop sleeps, and it reaches the services over cluster DNS,
+# so no port-forward has to stay open.
+#
+# The generator is `scripts/traffic.js` mounted from a ConfigMap that `make
+# k8s-traffic` builds from the same file the local target runs — one copy of the
+# source, two places to run it. The scripts need no npm dependencies (Node 22
+# has global fetch), so a stock node image is enough and there is nothing extra
+# to build or push.
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: traffic
+  namespace: assurance
+  labels:
+    app.kubernetes.io/name: traffic
+    app.kubernetes.io/component: load-generator
+    app.kubernetes.io/part-of: assurance
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: traffic
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: traffic
+        app.kubernetes.io/component: load-generator
+        app.kubernetes.io/part-of: assurance
+    spec:
+      containers:
+        - name: traffic
+          image: node:22-alpine
+          command: ["node", "/scripts/traffic.js"]
+          env:
+            # Cluster DNS — the generator talks to the services directly.
+            - name: QUOTE_URL
+              value: "http://quote-service:8080"
+            - name: WORKFLOW_URL
+              value: "http://workflow-service:8080"
+
+            # One request every RATE_MS. 4000 is a trickle; drop it to speed up.
+            - name: RATE_MS
+              value: "4000"
+
+            # DRIVE=0 submits only, leaving the employee queue to pile up.
+            - name: DRIVE
+              value: "1"
+
+            # How often to log a summary line (ms).
+            - name: REPORT_MS
+              value: "60000"
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
+          resources:
+            requests: { cpu: "20m", memory: "64Mi" }
+            limits: { cpu: "500m", memory: "256Mi" }
+      volumes:
+        - name: scripts
+          configMap:
+            name: assurance-traffic-scripts

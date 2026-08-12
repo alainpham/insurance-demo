@@ -38,12 +38,14 @@ make k8s-demo      # the three scripted demo cases
 make k8s-seed      # the 100-organisation portfolio
 make k8s-smoke     # the same 15 assertions, against the cluster
 
-make k8s-traffic   # steady trickle — leave this running in one terminal
-make k8s-forward   # and this in another, to browse the apps
+make k8s-traffic   # deploy a steady trickle of quotes INTO the cluster
+make k8s-forward   # port-forward, to browse the apps (holds the terminal)
 ```
 
-`make k8s-traffic` and `make k8s-forward` both hold the terminal open, so run them
-separately. Everything else brings its own port-forward up and tears it down again.
+`make k8s-traffic` deploys the generator as a pod, so it keeps producing quotes after you
+close the laptop — nothing has to stay running locally. `make k8s-forward` is the only
+target that holds the terminal open; everything else brings its own port-forward up and
+tears it down again.
 
 Once `k8s-forward` is running, the apps are on the **same localhost ports as Compose**
 (3001 public form, 3005 back office, 8025 Mailpit) — so the links above work unchanged.
@@ -193,6 +195,7 @@ Four ways, smallest to largest.
 |---|---|---|
 | `make seed` | 100 organisations through the real APIs, ~10s, then stops | Fill an empty dashboard before a demo |
 | `make traffic` | Endless trickle, ~1 request every 4s, drives some cases through to a decision | Leave running during a demo so the charts keep moving |
+| `make k8s-traffic` | The same generator, deployed as a pod in the cluster | A demo that has to keep running after you close the laptop |
 | `make load-quick` | k6, 30s at 3 rps | Sanity-check that load works |
 | `make load` | k6, 3 minutes at 3 rps | The real load demo |
 
@@ -257,7 +260,8 @@ make k8s-delete
 | `k8s-restart` | roll the deployments to pick up a new image |
 | `k8s-forward` | hold the port-forwards open for browsing |
 | `k8s-smoke` / `k8s-seed` / `k8s-demo` | run the scripts against the cluster |
-| `k8s-chaos-on` / `k8s-chaos-off` / `k8s-load` / `k8s-traffic` | the ops targets, against the cluster |
+| `k8s-traffic` / `k8s-traffic-logs` / `k8s-traffic-stop` | the in-cluster trickle: deploy, watch, remove |
+| `k8s-chaos-on` / `k8s-chaos-off` / `k8s-load` | the other ops targets, against the cluster |
 
 ### Images
 
@@ -305,6 +309,28 @@ quote email, the PDF download, and the Faro collector. Those cannot use in-clust
 they live in `k8s/01-endpoints.yaml`, defaulted to the port-forward addresses. If you
 expose the apps through your own ingress, that ConfigMap is the only edit needed.
 
+### Traffic, generated inside the cluster
+
+```sh
+make k8s-traffic                  # one quote every 4s, forever
+make k8s-traffic RATE_MS=1000     # faster
+make k8s-traffic DRIVE=0          # submit only, let the employee queue pile up
+make k8s-traffic-logs             # watch it
+make k8s-traffic-stop             # remove it
+```
+
+`k8s/30-traffic.yaml` runs `scripts/traffic.js` — the same generator the local `make
+traffic` uses — as a Deployment, talking to `quote-service` over cluster DNS. It is
+mounted from a ConfigMap built out of `scripts/`, so there is one copy of the source and
+**no extra image to build or push**: the scripts have no npm dependencies, so stock
+`node:22-alpine` is enough.
+
+It is deliberately not part of `make k8s-deploy`, because it writes real data. Re-running
+`make k8s-traffic` with different settings rolls the pod rather than starting a second one.
+
+In a pod the generator logs a summary once a minute instead of redrawing a status line
+every second; set `REPORT_MS` to change that.
+
 ### Manifests
 
 Each service keeps its own `deploy.yaml` next to its code, the way `njsexpress` generates
@@ -312,7 +338,8 @@ it — Deployment plus ClusterIP Service, with the env wiring and `/health` prob
 Everything else is three files:
 
 ```
-k8s/00-namespace.yaml   k8s/01-endpoints.yaml   k8s/10-postgres.yaml   k8s/20-mailpit.yaml
+k8s/00-namespace.yaml   k8s/01-endpoints.yaml   k8s/10-postgres.yaml
+k8s/20-mailpit.yaml     k8s/30-traffic.yaml     (opt-in, see above)
 ```
 
 Postgres is a StatefulSet with a PVC; the PDF store has one too.

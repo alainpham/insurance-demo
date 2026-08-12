@@ -94,16 +94,24 @@ async function once() {
     }
 }
 
-console.log(`\nTraffic generator — one request every ${RATE_MS}ms${DRIVE ? "" : " (submit only)"}.`);
-console.log("Ctrl-C to stop.\n");
+// In a terminal, redraw a status line every second. In a pod, that would be one
+// log line per second forever — so log a summary every REPORT_MS instead.
+const INTERACTIVE = process.stdout.isTTY && process.env.REPORT_MS === undefined;
+const REPORT_MS = Number(process.env.REPORT_MS || 60000);
+
+console.log(`Traffic generator — one request every ${RATE_MS}ms${DRIVE ? "" : " (submit only)"}, target ${L.QUOTE}`);
+if (INTERACTIVE) console.log("Ctrl-C to stop.\n");
 
 const timer = setInterval(() => { once(); }, RATE_MS);
-const reporter = setInterval(() => {
-    process.stdout.write(
-        `  submitted ${submitted} · priced ${priced} · closed ${advanced}` +
-        (failed ? ` · failed ${failed}` : "") + "        \r"
-    );
-}, 1000);
+const reporter = setInterval(
+    () => {
+        const line = `submitted ${submitted} · priced ${priced} · closed ${advanced}` +
+            (failed ? ` · failed ${failed}` : "");
+        if (INTERACTIVE) process.stdout.write("  " + line + "        \r");
+        else console.log(line);
+    },
+    INTERACTIVE ? 1000 : REPORT_MS
+);
 
 function stop() {
     clearInterval(timer);

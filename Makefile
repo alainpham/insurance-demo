@@ -24,7 +24,7 @@ WORKFLOW_URL ?= http://localhost:3003
         traffic clean urls tag push \
         k8s-deploy k8s-images k8s-forward k8s-status k8s-logs k8s-restart \
         k8s-smoke k8s-seed k8s-demo k8s-delete k8s-chaos-on k8s-chaos-off \
-        k8s-load k8s-load-quick k8s-traffic
+        k8s-load k8s-load-quick k8s-traffic k8s-traffic-logs k8s-traffic-stop k8s-traffic-local
 
 help: ## Show this help
 	@grep -E '^[a-zA-Z0-9_-]+:.*?## .*$$' $(MAKEFILE_LIST) \
@@ -178,7 +178,29 @@ k8s-load: ## Run the k6 load script against the cluster
 k8s-load-quick: ## Same, 30 seconds
 	@NS=$(NS) ./scripts/k8s-forward.sh --run "make load-quick $(if $(RPS),RPS=$(RPS))"
 
-k8s-traffic: ## Endless trickle against the cluster
+k8s-traffic: ## Deploy the steady trickle INTO the cluster (RATE_MS=1500 to speed up)
+	@kubectl -n $(NS) create configmap assurance-traffic-scripts \
+		--from-file=lib.js=scripts/lib.js \
+		--from-file=traffic.js=scripts/traffic.js \
+		--dry-run=client -o yaml | kubectl apply -f - >/dev/null
+	@kubectl apply -f k8s/30-traffic.yaml
+	@kubectl -n $(NS) set env deploy/traffic \
+		$(if $(RATE_MS),RATE_MS=$(RATE_MS)) $(if $(DRIVE),DRIVE=$(DRIVE)) \
+		RESTARTED_AT=$$(date +%s) >/dev/null
+	@kubectl -n $(NS) rollout status deploy/traffic --timeout=180s
+	@echo ""
+	@echo "  generating traffic inside the cluster. 'make k8s-traffic-logs' to watch,"
+	@echo "  'make k8s-traffic-stop' to stop it."
+	@echo ""
+
+k8s-traffic-logs: ## Follow the in-cluster traffic generator
+	@kubectl -n $(NS) logs -f deploy/traffic --tail=20
+
+k8s-traffic-stop: ## Remove the in-cluster traffic generator
+	@kubectl -n $(NS) delete deploy/traffic cm/assurance-traffic-scripts --ignore-not-found
+	@echo "  traffic generator removed"
+
+k8s-traffic-local: ## Run the trickle from here instead, through a port-forward
 	@NS=$(NS) ./scripts/k8s-forward.sh --run "node scripts/traffic.js"
 
 k8s-delete: ## Delete everything from the cluster
