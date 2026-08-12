@@ -1,3 +1,6 @@
+# Grab the Grafana Alloy binary from the official image
+FROM grafana/alloy:latest AS alloy
+
 # Use the official Node.js image as the base image
 FROM node:22
 
@@ -14,8 +17,13 @@ RUN npm install --omit=dev --quiet
 COPY public ./public
 COPY server ./server
 
+# Bring in Alloy so it can tail the app's log file and ship it to Loki
+COPY --from=alloy /bin/alloy /usr/local/bin/alloy
+COPY entrypoint.sh /usr/local/bin/entrypoint.sh
+RUN chmod +x /usr/local/bin/entrypoint.sh
+
 # Expose the port the app runs on
 EXPOSE 8080
 
-# Command to run the application
-CMD ["node", "server/server.js"]
+# LOKI_ENDPOINT, LOKI_USER and LOKI_PASSWORD must be provided at runtime
+ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

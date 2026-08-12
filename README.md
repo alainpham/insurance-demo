@@ -5,6 +5,8 @@ public quote form, and a back office where an employee turns a request into a qu
 sends it — with OpenTelemetry throughout and Grafana dashboards that show the business
 model, not just the CPU.
 
+![alt text](image.png)
+
 ---
 
 ## Quick start

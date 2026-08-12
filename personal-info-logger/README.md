@@ -56,10 +56,15 @@ docker push alainpham/personal-info-logger
 
 ## Running the Docker Container
 
-To run the Docker container, use the following command:
+The image bundles a Grafana Alloy instance that tails the app's `logs/pii.log`
+and ships it to Loki, configured via env vars:
 
 ```sh
-docker run --rm -p 8080:8080 --name personal-info-logger alainpham/personal-info-logger
+docker run -d -p 8080:8080 --name personal-info-logger \
+  -e LOKI_ENDPOINT="https://logs-prod-XXX.grafana.net/loki/api/v1/push" \
+  -e LOKI_USER="<instance id>" \
+  -e LOKI_PASSWORD="<grafana cloud api key>" \
+  alainpham/personal-info-logger:latest
 ```
 
 ## Stopping the Docker Container
